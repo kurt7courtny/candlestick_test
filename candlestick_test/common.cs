@@ -42,7 +42,7 @@ namespace candlestick_test
                 foreach (string line in lines)
                 {
                     string[] columns = line.Split(',');
-                    foreach (string column in columns)
+                    if( columns.Length == 7)
                     {
                         // Do something
                         // Console.WriteLine(columns);
@@ -50,13 +50,13 @@ namespace candlestick_test
                         if( DateTime.TryParseExact( columns[0], "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt)){
                             timeframe = 10;
                         }
-                        else if(DateTime.TryParseExact(columns[0], "yyyy/MM/dd hh:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt))
+                        else if(DateTime.TryParseExact(columns[0], "yyyy/MM/dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt))
                         {
                             timeframe = 20;
                         }
                         else
                         {
-                                return bflag;
+                            return bflag;
                         }
                         cd.open = double.Parse(columns[1]);
                         cd.high = double.Parse(columns[2]);
