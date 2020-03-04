@@ -13,12 +13,28 @@ namespace candlestick_test
 {
     public partial class Form1 : Form
     {
+        private bool play_state;
         private instrument_data id_series;
+        private Timer myTimer;
+        private Series price;
+        private int price_pos;
 
         public Form1()
         {
             InitializeComponent();
+            play_state = true;
+            
             id_series = new instrument_data();
+            
+            comboBox1.Items.Add("每秒3根");
+            comboBox1.Items.Add("每秒1根");
+            comboBox1.Items.Add("3秒1根");
+            comboBox1.SelectedIndex = 1;
+            myTimer = new System.Windows.Forms.Timer();
+            //给timer挂起事件  
+            myTimer.Tick += new EventHandler(myTimer_Callback);
+            changeplaystate();
+            //reset_timer();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -83,6 +99,43 @@ namespace candlestick_test
             }
 
             chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            changeplaystate();
+        }
+
+        private void changeplaystate()
+        {
+            if (play_state)
+            {
+                button5.Image = candlestick_test.Properties.Resources.play;
+            }
+            else
+            {
+                button5.Image = candlestick_test.Properties.Resources.pause;
+            }
+            play_state = !play_state;
+            reset_timer();
+        }
+
+        private void reset_timer()
+        {
+            myTimer.Enabled = play_state;
+            if( comboBox1.SelectedIndex == 0)
+                myTimer.Interval = 330;
+            else if (comboBox1.SelectedIndex == 1)
+                myTimer.Interval = 1000;
+            else if (comboBox1.SelectedIndex == 2)
+                myTimer.Interval = 3000;
+            else
+                myTimer.Interval = 1000;
+        }
+
+        private void myTimer_Callback(object sender, EventArgs e)
+        {
+            Console.WriteLine("tick! time now " + DateTime.Now.ToString());
         }
     }
 }
