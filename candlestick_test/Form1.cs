@@ -137,7 +137,7 @@ namespace candlestick_test
             {
                 tool_status.Text = "init_draw, 数据量不够，最少 " + min_candle_numbs;
             }
-            draw_one();
+            //draw_one();
         }
 
         private void draw_one()
@@ -304,7 +304,7 @@ namespace candlestick_test
         private void button2_Click(object sender, EventArgs e)
         {
             // sell
-            if ( mytrade == null)
+            if ( mytrade == null && my_instrument_data.candle_series.Count>0)
             {
                 var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                 mytrade = new trade_single();
@@ -323,7 +323,7 @@ namespace candlestick_test
         private void button3_Click(object sender, EventArgs e)
         {
             //buy
-            if (mytrade == null)
+            if (mytrade == null && my_instrument_data.candle_series.Count > 0)
             {
                 var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                 mytrade = new trade_single();
@@ -338,6 +338,43 @@ namespace candlestick_test
                 tool_status.Text = "请先平仓!";
             }
 
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            //Suppose when User Press Ctrl + J then Click Button1
+
+            if (e.KeyCode == Keys.NumPad0)
+            {
+                changeplaystate();
+            }
+            if (e.KeyCode == Keys.NumPad1)
+            {
+                button3.PerformClick();
+            }
+            if (e.KeyCode == Keys.NumPad2)
+            {
+                button2.PerformClick();
+            }
+            if (e.KeyCode == Keys.NumPad3)
+            {
+                button1.PerformClick();
+            }
+            if (e.KeyCode == Keys.NumPad4)
+            {
+                comboBox1.SelectedIndex = 0;
+                reset_timer();
+            }
+            if (e.KeyCode == Keys.NumPad5)
+            {
+                comboBox1.SelectedIndex = 1;
+                reset_timer();
+            }
+            if (e.KeyCode == Keys.NumPad6)
+            {
+                comboBox1.SelectedIndex = 2;
+                reset_timer();
+            }
         }
     }
 }
