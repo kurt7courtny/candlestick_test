@@ -13,14 +13,18 @@ namespace candlestick_test
 {
     public partial class Form1 : Form
     {
+        private int min_candle_numbs = 1000;    // 最小数据量
+        private int f_candle_numbs = 100;       // 前历史k线数量
+        private int b_candle_numbs = 500;       // 后测试k线数据
+
         private bool play_state;
         private instrument_data id_series;
-        private Timer myTimer;
-        private Series price;
-        private int price_pos;
+        private Timer myTimer;        
 
         public Form1()
         {
+            myTimer = new System.Windows.Forms.Timer();
+            myTimer.Tick += new EventHandler(myTimer_Callback);
             InitializeComponent();
             play_state = true;
             
@@ -30,9 +34,7 @@ namespace candlestick_test
             comboBox1.Items.Add("每秒1根");
             comboBox1.Items.Add("3秒1根");
             comboBox1.SelectedIndex = 1;
-            myTimer = new System.Windows.Forms.Timer();
-            //给timer挂起事件  
-            myTimer.Tick += new EventHandler(myTimer_Callback);
+            
             changeplaystate();
             //reset_timer();
         }
@@ -64,7 +66,8 @@ namespace candlestick_test
                 {
                     id_series = new_id;
                     label1.Text = new_id.instrument_name;
-                    draw_candle();
+                    init_candle();
+                    //draw_candle();
                 }
                 else
                 {
@@ -73,17 +76,119 @@ namespace candlestick_test
             }
         }
 
+        private void init_candle()
+        {
+            if( id_series.candle_series.Count > min_candle_numbs)
+            {
+                chart1.Series.Clear();
+                
+                Series price = new Series("price");
+                Series volumn = new Series("volumn");
+                price.IsXValueIndexed = true;
+                volumn.IsXValueIndexed = true;
+                chart1.Series.Add(price);
+                chart1.Series.Add(volumn);
+                chart1.Series["price"].ChartArea = "ChartArea1";
+                chart1.Series["volumn"].ChartArea = "ChartArea2";
+
+                chart1.Series["price"].ChartType = SeriesChartType.Candlestick;
+                chart1.Series["volumn"].ChartType = SeriesChartType.Column;
+
+                // Set point width
+                chart1.Series["price"]["PointWidth"] = "1.0";
+                chart1.Series["price"]["PriceUpColor"] = "Red";
+                chart1.Series["price"]["PriceDownColor"] = "Green";
+                chart1.Series["price"].XValueType = ChartValueType.DateTime;
+                chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
+                chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
+
+                Random r = new Random();
+                id_series.price_pos = r.Next(f_candle_numbs, min_candle_numbs - b_candle_numbs); //for ints
+                for (int i = 0; i < f_candle_numbs; i++)
+                {
+                    var cd = (candle_data)id_series.candle_series[id_series.price_pos];
+                    // adding date and high
+                    chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
+                    // adding low
+                    chart1.Series["price"].Points[id_series.chart_pos].YValues[1] = cd.low;
+                    //adding open
+                    chart1.Series["price"].Points[id_series.chart_pos].YValues[2] = cd.open;
+                    // adding close
+                    chart1.Series["price"].Points[id_series.chart_pos].YValues[3] = cd.close;
+
+                    chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
+                    if (cd.open < cd.close)
+                        chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Red;
+                    else
+                        chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Green;
+
+                    id_series.price_pos++;
+                    id_series.chart_pos++;
+
+                }
+                
+            }
+            else
+            {
+                tool_status.Text = "init_draw, 数据量不够，最少 " + min_candle_numbs;
+            }
+        }
+
+        private void draw_one()
+        {
+            if (id_series.candle_series.Count > min_candle_numbs)
+            {
+                var cd = (candle_data)id_series.candle_series[id_series.price_pos];
+                // adding date and high
+                chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
+                // adding low
+                chart1.Series["price"].Points[id_series.chart_pos].YValues[1] = cd.low;
+                //adding open
+                chart1.Series["price"].Points[id_series.chart_pos].YValues[2] = cd.open;
+                // adding close
+                chart1.Series["price"].Points[id_series.chart_pos].YValues[3] = cd.close;
+
+                chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
+                if (cd.open < cd.close)
+                    chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Red;
+                else
+                    chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Green;
+
+                id_series.price_pos++;
+                id_series.chart_pos++;
+
+                Axis xaxis = chart1.ChartAreas[0].AxisX;
+                xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
+                xaxis = chart1.ChartAreas[1].AxisX;
+                xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
+            }
+            else
+            {
+                tool_status.Text = "draw_one, 数据量不够，最少 " + min_candle_numbs;
+            }
+        }
+
         private void draw_candle()
         {
             chart1.Series.Clear();
             Series price = new Series("price");
+            Series volumn = new Series("volumn");
+            price.IsXValueIndexed = true;
+            volumn.IsXValueIndexed = true;
             chart1.Series.Add(price);
+            chart1.Series.Add(volumn);
+            chart1.Series["price"].ChartArea = "ChartArea1";
+            chart1.Series["volumn"].ChartArea = "ChartArea2";
+
             chart1.Series["price"].ChartType = SeriesChartType.Candlestick;
+            chart1.Series["volumn"].ChartType = SeriesChartType.Column;
+
             // Set point width
             chart1.Series["price"]["PointWidth"] = "1.0";
             chart1.Series["price"]["PriceUpColor"] = "Red";
             chart1.Series["price"]["PriceDownColor"] = "Green";
             chart1.Series["price"].XValueType = ChartValueType.DateTime;
+            chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
             //for (int i = 0; i < id_series.candle_series.Count; i++)
             for (int i = 0; i < 10; i++)
             {
@@ -96,8 +201,13 @@ namespace candlestick_test
                 chart1.Series["price"].Points[i].YValues[2] = cd.open;
                 // adding close
                 chart1.Series["price"].Points[i].YValues[3] = cd.close;
+
+                chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
+
             }
 
+            //chart1.ChartAreas[0].AxisX.
+            chart1.ChartAreas[0].AxisX.Interval = 5;
             chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
         }
 
@@ -135,7 +245,13 @@ namespace candlestick_test
 
         private void myTimer_Callback(object sender, EventArgs e)
         {
+            draw_one();
             Console.WriteLine("tick! time now " + DateTime.Now.ToString());
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            reset_timer();
         }
     }
 }

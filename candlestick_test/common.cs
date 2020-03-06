@@ -24,13 +24,16 @@ namespace candlestick_test
     {
         public string instrument_name;
         public int timeframe;                                  // 10:daily 20:m30
-        public ArrayList candle_series;                        // 
+        public ArrayList candle_series;                        // 价格数据
+        public int price_pos;                                  // 目前的价格位置
+        public int chart_pos;
 
         public instrument_data()
         {
             instrument_name = "unknown";
             timeframe = 0;
             candle_series = new ArrayList();
+            price_pos = chart_pos = 0;
         }
 
         public bool try_parse(string fn)
@@ -79,4 +82,43 @@ namespace candlestick_test
             return bflag;
         }
     }
+
+    // 单笔交易
+    public class trade_single
+    {
+        public string str_instrumentid;
+        public DateTime dt;
+        public double open_price;
+        public double close_price;
+        public int lots;                // 1
+        public int direction;           // -1, 1
+        public trade_single()
+        {
+            str_instrumentid = "Unkown";
+            lots = 1;
+        }
+    }
+
+    // 整个交易
+    public class trades_all
+    {
+        public ArrayList trades;            // 交易历史记录
+
+        public double totalfunds;           // 交易资金
+        public int totaltrades;             // 交易次数
+        public int wins;                    // 盈利次数
+
+        public trades_all()
+        {
+            trades = new ArrayList();
+            totalfunds = 300000;
+            totaltrades = 0;
+        }
+
+        public void addnewtrade( trade_single mytrade)
+        {
+
+        }
+    }
+
 }
