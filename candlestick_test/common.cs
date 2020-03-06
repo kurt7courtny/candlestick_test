@@ -111,13 +111,20 @@ namespace candlestick_test
         public trades_all()
         {
             trades = new ArrayList();
-            totalfunds = 300000;
+            totalfunds = 0;
             totaltrades = 0;
         }
 
         public void addnewtrade( trade_single mytrade)
         {
-
+            if( mytrade != null)
+            {
+                totalfunds += (mytrade.close_price - mytrade.open_price) * mytrade.direction;
+                totaltrades++;
+                wins += (mytrade.close_price - mytrade.open_price) * mytrade.direction > 0 ? 1 : 0;
+                trades.Add(mytrade);
+                
+            }
         }
     }
 

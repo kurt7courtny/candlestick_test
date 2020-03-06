@@ -18,7 +18,9 @@ namespace candlestick_test
         private int b_candle_numbs = 500;       // 后测试k线数据
 
         private bool play_state;
-        private instrument_data id_series;
+        private instrument_data my_instrument_data;
+        private trades_all mytrades;
+        private trade_single mytrade;
         private Timer myTimer;        
 
         public Form1()
@@ -27,9 +29,11 @@ namespace candlestick_test
             myTimer.Tick += new EventHandler(myTimer_Callback);
             InitializeComponent();
             play_state = true;
-            
-            id_series = new instrument_data();
-            
+
+            my_instrument_data = new instrument_data();
+            mytrades = new trades_all();
+            mytrade = null;
+
             comboBox1.Items.Add("每秒3根");
             comboBox1.Items.Add("每秒1根");
             comboBox1.Items.Add("3秒1根");
@@ -64,9 +68,10 @@ namespace candlestick_test
                 instrument_data new_id = new instrument_data();
                 if (new_id.try_parse(fn))
                 {
-                    id_series = new_id;
+                    my_instrument_data = new_id;
                     label1.Text = new_id.instrument_name;
                     init_candle();
+                    mytrade = null;
                     //draw_candle();
                 }
                 else
@@ -78,7 +83,7 @@ namespace candlestick_test
 
         private void init_candle()
         {
-            if( id_series.candle_series.Count > min_candle_numbs)
+            if(my_instrument_data.candle_series.Count > min_candle_numbs)
             {
                 chart1.Series.Clear();
                 
@@ -100,30 +105,30 @@ namespace candlestick_test
                 chart1.Series["price"]["PriceDownColor"] = "Green";
                 chart1.Series["price"].XValueType = ChartValueType.DateTime;
                 chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
-                chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
+                //chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
 
                 Random r = new Random();
-                id_series.price_pos = r.Next(f_candle_numbs, min_candle_numbs - b_candle_numbs); //for ints
+                my_instrument_data.price_pos = r.Next(f_candle_numbs, min_candle_numbs - b_candle_numbs); //for ints
                 for (int i = 0; i < f_candle_numbs; i++)
                 {
-                    var cd = (candle_data)id_series.candle_series[id_series.price_pos];
+                    var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                     // adding date and high
                     chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
                     // adding low
-                    chart1.Series["price"].Points[id_series.chart_pos].YValues[1] = cd.low;
+                    chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[1] = cd.low;
                     //adding open
-                    chart1.Series["price"].Points[id_series.chart_pos].YValues[2] = cd.open;
+                    chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[2] = cd.open;
                     // adding close
-                    chart1.Series["price"].Points[id_series.chart_pos].YValues[3] = cd.close;
+                    chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[3] = cd.close;
 
                     chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
                     if (cd.open < cd.close)
-                        chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Red;
+                        chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Red;
                     else
-                        chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Green;
+                        chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
 
-                    id_series.price_pos++;
-                    id_series.chart_pos++;
+                    my_instrument_data.price_pos++;
+                    my_instrument_data.chart_pos++;
 
                 }
                 
@@ -132,40 +137,65 @@ namespace candlestick_test
             {
                 tool_status.Text = "init_draw, 数据量不够，最少 " + min_candle_numbs;
             }
+            draw_one();
         }
 
         private void draw_one()
         {
-            if (id_series.candle_series.Count > min_candle_numbs)
-            {
-                var cd = (candle_data)id_series.candle_series[id_series.price_pos];
-                // adding date and high
-                chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
-                // adding low
-                chart1.Series["price"].Points[id_series.chart_pos].YValues[1] = cd.low;
-                //adding open
-                chart1.Series["price"].Points[id_series.chart_pos].YValues[2] = cd.open;
-                // adding close
-                chart1.Series["price"].Points[id_series.chart_pos].YValues[3] = cd.close;
-
-                chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
-                if (cd.open < cd.close)
-                    chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Red;
-                else
-                    chart1.Series["volumn"].Points[id_series.chart_pos].Color = Color.Green;
-
-                id_series.price_pos++;
-                id_series.chart_pos++;
-
-                Axis xaxis = chart1.ChartAreas[0].AxisX;
-                xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
-                xaxis = chart1.ChartAreas[1].AxisX;
-                xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
-            }
-            else
+            if (my_instrument_data.candle_series.Count < min_candle_numbs)
             {
                 tool_status.Text = "draw_one, 数据量不够，最少 " + min_candle_numbs;
+                return;
             }
+
+            if (my_instrument_data.candle_series.Count == my_instrument_data.price_pos)
+            {
+                tool_status.Text = "draw_one, 已经到达最后一根k线";
+                return;
+            }
+            
+            var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
+            // adding date and high
+            chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
+            // adding low
+            chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[1] = cd.low;
+            //adding open
+            chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[2] = cd.open;
+            // adding close
+            chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[3] = cd.close;
+
+            chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
+            if (cd.open < cd.close)
+                chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Red;
+            else
+                chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
+
+            my_instrument_data.price_pos++;
+            my_instrument_data.chart_pos++;
+
+            Axis xaxis = chart1.ChartAreas[0].AxisX;
+            xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
+            xaxis = chart1.ChartAreas[1].AxisX;
+            xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
+            Axis yaxis = chart1.ChartAreas[0].AxisY;
+
+            double min_v = double.MaxValue;
+            double max_v = -1;
+
+            for (int i = 0; i < f_candle_numbs; i++)
+            {
+                cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos-i];
+                min_v = Math.Min(cd.low, min_v);
+                max_v = Math.Max(cd.high, max_v);
+            }
+            yaxis.Minimum = min_v * 0.95;
+            yaxis.Maximum = max_v * 1.05;
+
+        }
+
+        private void update_info()
+        {
+            textBox1.Text = String.Format("{0:0,0.0}", mytrades.totalfunds);
         }
 
         private void draw_candle()
@@ -192,7 +222,7 @@ namespace candlestick_test
             //for (int i = 0; i < id_series.candle_series.Count; i++)
             for (int i = 0; i < 10; i++)
             {
-                var cd = (candle_data)id_series.candle_series[i];
+                var cd = (candle_data)my_instrument_data.candle_series[i];
                 // adding date and high
                 chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
                 // adding low
@@ -246,12 +276,68 @@ namespace candlestick_test
         private void myTimer_Callback(object sender, EventArgs e)
         {
             draw_one();
+            update_info();
             Console.WriteLine("tick! time now " + DateTime.Now.ToString());
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             reset_timer();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            // close
+            if (mytrade != null)
+            {
+                var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
+                mytrade.close_price = cd.close;
+                mytrades.addnewtrade(mytrade);
+                mytrade = null;
+            }
+            else
+            {
+                tool_status.Text = "暂无需要平的仓位!";
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // sell
+            if ( mytrade == null)
+            {
+                var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
+                mytrade = new trade_single();
+                mytrade.str_instrumentid = my_instrument_data.instrument_name;
+                mytrade.direction = -1;
+                mytrade.dt = cd.dt;
+                mytrade.open_price = cd.close;
+                mytrade.lots = 1;
+            }
+            else
+            {
+                tool_status.Text = "请先平仓!";
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            //buy
+            if (mytrade == null)
+            {
+                var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
+                mytrade = new trade_single();
+                mytrade.str_instrumentid = my_instrument_data.instrument_name;
+                mytrade.direction = 1;
+                mytrade.dt = cd.dt;
+                mytrade.open_price = cd.close;
+                mytrade.lots = 1;
+            }
+            else
+            {
+                tool_status.Text = "请先平仓!";
+            }
+
         }
     }
 }
