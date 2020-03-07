@@ -170,9 +170,6 @@ namespace candlestick_test
             else
                 chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
 
-            my_instrument_data.price_pos++;
-            my_instrument_data.chart_pos++;
-
             Axis xaxis = chart1.ChartAreas[0].AxisX;
             xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
             xaxis = chart1.ChartAreas[1].AxisX;
@@ -190,6 +187,9 @@ namespace candlestick_test
             }
             yaxis.Minimum = min_v * 0.95;
             yaxis.Maximum = max_v * 1.05;
+
+            my_instrument_data.price_pos++;
+            my_instrument_data.chart_pos++;
 
         }
 
