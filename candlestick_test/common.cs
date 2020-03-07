@@ -42,6 +42,7 @@ namespace candlestick_test
             try
             {
                 string[] lines = System.IO.File.ReadAllLines(fn);
+                DateTime dt2 = new DateTime(2016, 1, 1, 0, 0, 0);
                 foreach (string line in lines)
                 {
                     string[] columns = line.Split(',');
@@ -61,6 +62,8 @@ namespace candlestick_test
                         {
                             return bflag;
                         }
+                        if (cd.dt < dt2)
+                            continue;
                         cd.open = double.Parse(columns[1]);
                         cd.high = double.Parse(columns[2]);
                         cd.low = double.Parse(columns[3]);
