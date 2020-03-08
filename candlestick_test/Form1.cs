@@ -177,7 +177,7 @@ namespace candlestick_test
             Axis yaxis = chart1.ChartAreas[0].AxisY;
 
             double min_v = double.MaxValue;
-            double max_v = -1;
+            double max_v = double.MinValue;
 
             for (int i = 0; i < f_candle_numbs; i++)
             {
