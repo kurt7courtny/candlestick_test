@@ -185,8 +185,8 @@ namespace candlestick_test
                 min_v = Math.Min(cd.low, min_v);
                 max_v = Math.Max(cd.high, max_v);
             }
-            yaxis.Minimum = min_v * 0.95;
-            yaxis.Maximum = max_v * 1.05;
+            yaxis.Minimum = min_v - (max_v - min_v) * 0.05 ;
+            yaxis.Maximum = max_v + (max_v - min_v) * 0.05;
 
             my_instrument_data.price_pos++;
             my_instrument_data.chart_pos++;
