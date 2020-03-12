@@ -196,6 +196,15 @@ namespace candlestick_test
         private void update_info()
         {
             textBox1.Text = String.Format("{0:0,0.0}", mytrades.totalfunds);
+            label3.Text = "胜率 盈：" + mytrades.wins + ", 亏：" + mytrades.loses + "，总：" + mytrades.totaltrades; 
+            if( mytrades.totaltrades != 0)
+            {
+                label3.Text += "，胜率：" + String.Format("{0:0.#}%", ((double)mytrades.wins) / mytrades.totaltrades * 100);
+            }
+            if( mytrades.loses != 0 && mytrades.wins != 0)
+            {
+                label4.Text = "盈亏比：" + String.Format("{0:0.#}", mytrades.winfunds / mytrades.wins / (mytrades.losefunds/ mytrades.loses));
+            }
         }
 
         private void draw_candle()

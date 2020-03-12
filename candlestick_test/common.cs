@@ -108,23 +108,40 @@ namespace candlestick_test
         public ArrayList trades;            // 交易历史记录
 
         public double totalfunds;           // 交易资金
+        public double winfunds;             // 盈利资金
+        public double losefunds;            // 亏损资金
         public int totaltrades;             // 交易次数
         public int wins;                    // 盈利次数
+        public int loses;
 
         public trades_all()
         {
             trades = new ArrayList();
             totalfunds = 0;
+            winfunds = losefunds = 0;
             totaltrades = 0;
+            wins = loses = 0;
         }
 
         public void addnewtrade( trade_single mytrade)
         {
             if( mytrade != null)
             {
-                totalfunds += (mytrade.close_price - mytrade.open_price) * mytrade.direction;
+                double profit = (mytrade.close_price - mytrade.open_price) * mytrade.direction;
+                if (profit > 0)
+                {
+                    winfunds += profit;
+                    wins ++;
+                }
+                else
+                {
+                    losefunds += profit;
+                    loses++;
+                }
+
+                totalfunds += profit;
                 totaltrades++;
-                wins += (mytrade.close_price - mytrade.open_price) * mytrade.direction > 0 ? 1 : 0;
+                //wins += (mytrade.close_price - mytrade.open_price) * mytrade.direction > 0 ? 1 : 0;
                 trades.Add(mytrade);
                 
             }
