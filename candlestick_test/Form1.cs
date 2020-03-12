@@ -21,6 +21,7 @@ namespace candlestick_test
         private instrument_data my_instrument_data;
         private trades_all mytrades;
         private trade_single mytrade;
+        private candle_data cd;
         private Timer myTimer;        
 
         public Form1()
@@ -33,6 +34,7 @@ namespace candlestick_test
             my_instrument_data = new instrument_data();
             mytrades = new trades_all();
             mytrade = null;
+            cd = new candle_data();
 
             comboBox1.Items.Add("每秒3根");
             comboBox1.Items.Add("每秒1根");
@@ -111,7 +113,7 @@ namespace candlestick_test
                 my_instrument_data.price_pos = r.Next(f_candle_numbs, my_instrument_data.candle_series.Count - b_candle_numbs); //for ints
                 for (int i = 0; i < f_candle_numbs; i++)
                 {
-                    var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
+                    cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                     // adding date and high
                     chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
                     // adding low
@@ -154,7 +156,7 @@ namespace candlestick_test
                 return;
             }
             
-            var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
+            cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
             // adding date and high
             chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
             // adding low
@@ -195,6 +197,8 @@ namespace candlestick_test
 
         private void update_info()
         {
+            if (cd != null)
+                label5.Text = "k线时间："cd.dt.ToString();
             textBox1.Text = String.Format("{0:0,0.0}", mytrades.totalfunds);
             label3.Text = "胜率 盈：" + mytrades.wins + ", 亏：" + mytrades.loses + "，总：" + mytrades.totaltrades; 
             if( mytrades.totaltrades != 0)
