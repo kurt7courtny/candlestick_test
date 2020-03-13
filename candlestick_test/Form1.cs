@@ -22,6 +22,7 @@ namespace candlestick_test
         private trades_all mytrades;
         private trade_single mytrade;
         private candle_data cd;
+        private int pos;
         private Timer myTimer;        
 
         public Form1()
@@ -35,6 +36,7 @@ namespace candlestick_test
             mytrades = new trades_all();
             mytrade = null;
             cd = new candle_data();
+            pos = 0;
 
             comboBox1.Items.Add("每秒3根");
             comboBox1.Items.Add("每秒1根");
@@ -91,13 +93,15 @@ namespace candlestick_test
                 
                 Series price = new Series("price");
                 Series volumn = new Series("volumn");
+                
                 price.IsXValueIndexed = true;
                 volumn.IsXValueIndexed = true;
                 chart1.Series.Add(price);
                 chart1.Series.Add(volumn);
+                
                 chart1.Series["price"].ChartArea = "ChartArea1";
                 chart1.Series["volumn"].ChartArea = "ChartArea2";
-
+                
                 chart1.Series["price"].ChartType = SeriesChartType.Candlestick;
                 chart1.Series["volumn"].ChartType = SeriesChartType.Column;
 
@@ -107,6 +111,7 @@ namespace candlestick_test
                 chart1.Series["price"]["PriceDownColor"] = "Green";
                 chart1.Series["price"].XValueType = ChartValueType.DateTime;
                 chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
+    
                 //chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
 
                 Random r = new Random();
@@ -158,7 +163,7 @@ namespace candlestick_test
             
             cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
             // adding date and high
-            chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
+            pos = chart1.Series["price"].Points.AddXY(cd.dt, cd.high);
             // adding low
             chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[1] = cd.low;
             //adding open
@@ -183,9 +188,9 @@ namespace candlestick_test
 
             for (int i = 0; i < f_candle_numbs; i++)
             {
-                cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos-i];
-                min_v = Math.Min(cd.low, min_v);
-                max_v = Math.Max(cd.high, max_v);
+                var pcd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos-i];
+                min_v = Math.Min(pcd.low, min_v);
+                max_v = Math.Max(pcd.high, max_v);
             }
             yaxis.Minimum = min_v - (max_v - min_v) * 0.05 ;
             yaxis.Maximum = max_v + (max_v - min_v) * 0.05;
@@ -198,7 +203,7 @@ namespace candlestick_test
         private void update_info()
         {
             if (cd != null)
-                label5.Text = "k线时间："cd.dt.ToString();
+                label5.Text = "k线时间：" + cd.dt.ToString();
             textBox1.Text = String.Format("{0:0,0.0}", mytrades.totalfunds);
             label3.Text = "胜率 盈：" + mytrades.wins + ", 亏：" + mytrades.loses + "，总：" + mytrades.totaltrades; 
             if( mytrades.totaltrades != 0)
@@ -207,7 +212,7 @@ namespace candlestick_test
             }
             if( mytrades.loses != 0 && mytrades.wins != 0)
             {
-                label4.Text = "盈亏比：" + String.Format("{0:0.#}", mytrades.winfunds / mytrades.wins / (mytrades.losefunds/ mytrades.loses));
+                label4.Text = "盈亏比：" + String.Format("{0:0.#}", -mytrades.winfunds / mytrades.wins / (mytrades.losefunds/ mytrades.loses));
             }
         }
 
@@ -290,7 +295,7 @@ namespace candlestick_test
         {
             draw_one();
             update_info();
-            Console.WriteLine("tick! time now " + DateTime.Now.ToString());
+            Console.WriteLine("tick! time now " + DateTime.Now.ToString() + " - " + cd.dt + "," + cd.open + "," + cd.high + "," + cd.low + "," + cd.close);
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -301,31 +306,32 @@ namespace candlestick_test
         private void button1_Click(object sender, EventArgs e)
         {
             // close
-            if (mytrade != null)
+            if (mytrade != null && cd != null)
             {
-                var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                 mytrade.close_price = cd.close;
                 mytrades.addnewtrade(mytrade);
                 mytrade = null;
+                chart1.Series["price"].Points[pos].Label = cd.close.ToString();
+                chart1.Series["price"].Points[pos].Color = Color.OrangeRed;
             }
             else
             {
                 tool_status.Text = "暂无需要平的仓位!";
             }
         }
-
+         
         private void button2_Click(object sender, EventArgs e)
         {
             // sell
-            if ( mytrade == null && my_instrument_data.candle_series.Count>0)
+            if ( mytrade == null && my_instrument_data.candle_series.Count>0 && cd != null)
             {
-                var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                 mytrade = new trade_single();
                 mytrade.str_instrumentid = my_instrument_data.instrument_name;
                 mytrade.direction = -1;
                 mytrade.dt = cd.dt;
                 mytrade.open_price = cd.close;
                 mytrade.lots = 1;
+                
             }
             else
             {
@@ -336,15 +342,15 @@ namespace candlestick_test
         private void button3_Click(object sender, EventArgs e)
         {
             //buy
-            if (mytrade == null && my_instrument_data.candle_series.Count > 0)
+            if (mytrade == null && my_instrument_data.candle_series.Count > 0 && cd != null)
             {
-                var cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
                 mytrade = new trade_single();
                 mytrade.str_instrumentid = my_instrument_data.instrument_name;
                 mytrade.direction = 1;
                 mytrade.dt = cd.dt;
                 mytrade.open_price = cd.close;
                 mytrade.lots = 1;
+                
             }
             else
             {
