@@ -311,8 +311,7 @@ namespace candlestick_test
                 mytrade.close_price = cd.close;
                 mytrades.addnewtrade(mytrade);
                 mytrade = null;
-                chart1.Series["price"].Points[pos].Label = cd.close.ToString();
-                chart1.Series["price"].Points[pos].Color = Color.OrangeRed;
+                chart1.Series["price"].Points[pos].Label = "<";
             }
             else
             {
@@ -331,7 +330,7 @@ namespace candlestick_test
                 mytrade.dt = cd.dt;
                 mytrade.open_price = cd.close;
                 mytrade.lots = 1;
-                
+                chart1.Series["price"].Points[pos].Label = "v";
             }
             else
             {
@@ -350,7 +349,7 @@ namespace candlestick_test
                 mytrade.dt = cd.dt;
                 mytrade.open_price = cd.close;
                 mytrade.lots = 1;
-                
+                chart1.Series["price"].Points[pos].Label = "^";
             }
             else
             {
