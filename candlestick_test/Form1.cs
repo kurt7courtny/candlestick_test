@@ -94,29 +94,31 @@ namespace candlestick_test
                 chart1.Series.Clear();
                 
                 Series price = new Series("price");
-                Series volumn = new Series("volumn");
+                //Series volumn = new Series("volumn");
                 
                 price.IsXValueIndexed = true;
-                volumn.IsXValueIndexed = true;
+                //volumn.IsXValueIndexed = true;
                 chart1.Series.Add(price);
-                chart1.Series.Add(volumn);
+                //chart1.Series.Add(volumn);
                 
                 chart1.Series["price"].ChartArea = "ChartArea1";
-                chart1.Series["volumn"].ChartArea = "ChartArea2";
+                //chart1.Series["volumn"].ChartArea = "ChartArea2";
                 
                 chart1.Series["price"].ChartType = SeriesChartType.Candlestick;
-                chart1.Series["volumn"].ChartType = SeriesChartType.Column;
+                //chart1.Series["volumn"].ChartType = SeriesChartType.Column;
 
                 // Set point width
                 chart1.Series["price"]["PointWidth"] = "1.0";
                 chart1.Series["price"]["PriceUpColor"] = "Red";
                 chart1.Series["price"]["PriceDownColor"] = "Green";
                 chart1.Series["price"].XValueType = ChartValueType.DateTime;
-                chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
+                
+                //chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
                 chart1.ChartAreas[0].AxisX.LabelStyle.Format = "yyyy/MM/dd";
-                chart1.ChartAreas[1].AxisX.LabelStyle.Format = "yyyy/MM/dd";
+                //chart1.ChartAreas[1].AxisX.LabelStyle.Format = "yyyy/MM/dd";
 
-                //chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
+                chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
+                //chart1.ChartAreas[1].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
 
                 Random r = new Random();
                 my_instrument_data.price_pos = r.Next(f_candle_numbs, my_instrument_data.candle_series.Count - b_candle_numbs); //for ints
@@ -132,11 +134,11 @@ namespace candlestick_test
                     // adding close
                     chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[3] = cd.close;
 
-                    chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
-                    if (cd.open < cd.close)
-                        chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Red;
-                    else
-                        chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
+                    //chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
+                    //if (cd.open < cd.close)
+                    //    chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Red;
+                    //else
+                    //    chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
 
                     my_instrument_data.price_pos++;
                     my_instrument_data.chart_pos++;
@@ -175,30 +177,45 @@ namespace candlestick_test
             // adding close
             chart1.Series["price"].Points[my_instrument_data.chart_pos].YValues[3] = cd.close;
 
-            chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
-            if (cd.open < cd.close)
-                chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Red;
-            else
-                chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
+            chart1.Series["price"].LegendText = String.Format("价格：{0}\n成交：{1}", cd.close, cd.v);
+            //chart1.Series["price"].Label = "";
+            //chart1.Series["price"].Points[my_instrument_data.chart_pos].Label = "asdf";
+            //chart1.Series["volumn"].Points.AddXY(cd.dt, cd.v);
+            //if (cd.open < cd.close)
+            //    chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Red;
+            //else
+            //    chart1.Series["volumn"].Points[my_instrument_data.chart_pos].Color = Color.Green;
 
             Axis xaxis = chart1.ChartAreas[0].AxisX;
             xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
-            xaxis = chart1.ChartAreas[1].AxisX;
-            xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
-            Axis yaxis = chart1.ChartAreas[0].AxisY;
+            //xaxis = chart1.ChartAreas[1].AxisX;
+            //xaxis.Minimum = xaxis.Maximum - f_candle_numbs;
 
-            double min_v = double.MaxValue;
-            double max_v = double.MinValue;
+            // Axis yaxis = chart1.ChartAreas[0].AxisY;
+
+            double min_p, min_v;
+            min_p = min_v = double.MaxValue;
+            double max_p, max_v;
+            max_p = max_v = double.MinValue;
 
             for (int i = 0; i < f_candle_numbs; i++)
             {
                 var pcd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos-i];
-                min_v = Math.Min(pcd.low, min_v);
-                max_v = Math.Max(pcd.high, max_v);
+                min_p = Math.Min(pcd.low, min_p);
+                min_v = Math.Min(pcd.v, min_v);
+                max_p = Math.Max(pcd.high, max_p);
+                max_v = Math.Max(pcd.v, max_v);
             }
-            yaxis.Minimum = min_v - (max_v - min_v) * 0.05 ;
-            yaxis.Maximum = max_v + (max_v - min_v) * 0.05;
 
+            Axis yaxis = chart1.ChartAreas[0].AxisY;
+            yaxis.Minimum = min_p - (max_p - min_p) * 0.05;
+            yaxis.Maximum = max_p + (max_p - min_p) * 0.05;
+
+            //yaxis = chart1.ChartAreas[1].AxisY;
+            //yaxis.Minimum = min_v - (max_v - min_v);// * 0.05;
+            //yaxis.Maximum = max_v + (max_v - min_v);// * 0.05;
+
+            //chart1.Legends[0].Title = cd.close.ToString();
             my_instrument_data.price_pos++;
             my_instrument_data.chart_pos++;
 
