@@ -30,7 +30,7 @@ namespace candlestick_test
             myTimer = new System.Windows.Forms.Timer();
             myTimer.Tick += new EventHandler(myTimer_Callback);
             InitializeComponent();
-            play_state = true;
+            play_state = false;
 
             my_instrument_data = new instrument_data();
             mytrades = new trades_all();
@@ -43,7 +43,7 @@ namespace candlestick_test
             comboBox1.Items.Add("3秒1根");
             comboBox1.SelectedIndex = 1;
             
-            changeplaystate();
+            changeplaystate(play_state);
             //reset_timer();
         }
 
@@ -263,20 +263,20 @@ namespace candlestick_test
 
         private void button5_Click(object sender, EventArgs e)
         {
-            changeplaystate();
+            changeplaystate(!play_state);
         }
 
-        private void changeplaystate()
+        private void changeplaystate(bool bflag)
         {
-            if (play_state)
-            {
-                button5.Image = candlestick_test.Properties.Resources.play;
-            }
-            else
+            if (bflag)
             {
                 button5.Image = candlestick_test.Properties.Resources.pause;
             }
-            play_state = !play_state;
+            else
+            {
+                button5.Image = candlestick_test.Properties.Resources.play;
+            }
+            play_state = bflag;
             reset_timer();
         }
 
@@ -291,6 +291,7 @@ namespace candlestick_test
                 myTimer.Interval = 3000;
             else
                 myTimer.Interval = 1000;
+            Console.WriteLine("setimer to " + myTimer.Enabled + " Timer intervals:" + myTimer.Interval);
         }
 
         private void myTimer_Callback(object sender, EventArgs e)
@@ -366,7 +367,7 @@ namespace candlestick_test
 
             if (e.KeyCode == Keys.NumPad0)
             {
-                changeplaystate();
+                button5.PerformClick();
             }
             if (e.KeyCode == Keys.NumPad1)
             {
@@ -394,6 +395,11 @@ namespace candlestick_test
             {
                 comboBox1.SelectedIndex = 2;
                 reset_timer();
+            }
+            if (e.KeyCode == Keys.Decimal)
+            {
+                changeplaystate(false);
+                this.WindowState = FormWindowState.Minimized;
             }
         }
     }
