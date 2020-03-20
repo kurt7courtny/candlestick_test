@@ -75,6 +75,8 @@ namespace candlestick_test
                     my_instrument_data = new_id;
                     label1.Text = new_id.instrument_name;
                     init_candle();
+                    mytrades = new trades_all();
+                    pos = 0;
                     mytrade = null;
                     //draw_candle();
                 }
