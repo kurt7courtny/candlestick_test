@@ -111,7 +111,9 @@ namespace candlestick_test
                 chart1.Series["price"]["PriceDownColor"] = "Green";
                 chart1.Series["price"].XValueType = ChartValueType.DateTime;
                 chart1.Series["volumn"].XValueType = ChartValueType.DateTime;
-    
+                chart1.ChartAreas[0].AxisX.LabelStyle.Format = "yyyy/MM/dd";
+                chart1.ChartAreas[1].AxisX.LabelStyle.Format = "yyyy/MM/dd";
+
                 //chart1.ChartAreas[0].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
 
                 Random r = new Random();
