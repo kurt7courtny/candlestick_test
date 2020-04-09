@@ -420,6 +420,16 @@ namespace candlestick_test
                 changeplaystate(false);
                 this.WindowState = FormWindowState.Minimized;
             }
+            if( e.KeyCode == Keys.NumPad7)
+            {
+                if (f_candle_numbs < 300)
+                    f_candle_numbs+=10;
+            }
+            if( e.KeyCode == Keys.NumPad8)
+            {
+                if (f_candle_numbs > 50)
+                    f_candle_numbs-=10;
+            }
         }
     }
 }
