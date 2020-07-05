@@ -38,9 +38,9 @@ namespace candlestick_test
             cd = new candle_data();
             pos = 0;
 
-            comboBox1.Items.Add("每秒3根");
-            comboBox1.Items.Add("每秒1根");
-            comboBox1.Items.Add("3秒1根");
+            comboBox1.Items.Add("1秒1根");
+            comboBox1.Items.Add("1.5秒1根");
+            comboBox1.Items.Add("2秒1根");
             comboBox1.SelectedIndex = 1;
             
             changeplaystate(play_state);
@@ -303,13 +303,13 @@ namespace candlestick_test
         {
             myTimer.Enabled = play_state;
             if( comboBox1.SelectedIndex == 0)
-                myTimer.Interval = 330;
+                myTimer.Interval = 1000;
             else if (comboBox1.SelectedIndex == 1)
-                myTimer.Interval = 1000;
+                myTimer.Interval = 1500;
             else if (comboBox1.SelectedIndex == 2)
-                myTimer.Interval = 3000;
+                myTimer.Interval = 2000;
             else
-                myTimer.Interval = 1000;
+                myTimer.Interval = 1500;
             Console.WriteLine("setimer to " + myTimer.Enabled + " Timer intervals:" + myTimer.Interval);
         }
 
