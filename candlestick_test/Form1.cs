@@ -14,8 +14,8 @@ namespace candlestick_test
     public partial class Form1 : Form
     {
         private int min_candle_numbs = 200;    // 最小数据量
-        private int f_candle_numbs = 150;       // 前历史k线数量
-        private int b_candle_numbs = 500;       // 后测试k线数据
+        private int f_candle_numbs = 100;       // 前历史k线数量
+        private int b_candle_numbs = 100;       // 后测试k线数据
 
         private bool play_state;
         private instrument_data my_instrument_data;
