@@ -39,8 +39,8 @@ namespace candlestick_test
             pos = 0;
 
             comboBox1.Items.Add("1秒1根");
-            comboBox1.Items.Add("1.5秒1根");
             comboBox1.Items.Add("2秒1根");
+            comboBox1.Items.Add("2.5秒1根");
             comboBox1.SelectedIndex = 1;
             
             changeplaystate(play_state);
@@ -121,7 +121,7 @@ namespace candlestick_test
                 //chart1.ChartAreas[1].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
 
                 Random r = new Random();
-                my_instrument_data.price_pos = r.Next(f_candle_numbs, my_instrument_data.candle_series.Count - b_candle_numbs); //for ints
+                my_instrument_data.price_pos = r.Next(0, my_instrument_data.candle_series.Count - b_candle_numbs - f_candle_numbs)/3 + f_candle_numbs; //for ints
                 for (int i = 0; i < f_candle_numbs; i++)
                 {
                     cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
@@ -305,11 +305,11 @@ namespace candlestick_test
             if( comboBox1.SelectedIndex == 0)
                 myTimer.Interval = 1000;
             else if (comboBox1.SelectedIndex == 1)
-                myTimer.Interval = 1500;
-            else if (comboBox1.SelectedIndex == 2)
                 myTimer.Interval = 2000;
+            else if (comboBox1.SelectedIndex == 2)
+                myTimer.Interval = 2500;
             else
-                myTimer.Interval = 1500;
+                myTimer.Interval = 2000;
             Console.WriteLine("setimer to " + myTimer.Enabled + " Timer intervals:" + myTimer.Interval);
         }
 
