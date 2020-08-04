@@ -46,32 +46,40 @@ namespace candlestick_test
                 foreach (string line in lines)
                 {
                     string[] columns = line.Split(',');
-                    if( columns.Length == 7)
+                    if( columns.Length >= 7)
                     {
                         // Do something
                         // Console.WriteLine(columns);
-                        var cd = new candle_data();
-                        if( DateTime.TryParseExact( columns[0], "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt)){
-                            timeframe = 10;
-                        }
-                        else if(DateTime.TryParseExact(columns[0], "yyyy/MM/dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt))
+                        try
                         {
-                            timeframe = 20;
-                        }
-                        else
-                        {
-                            return bflag;
-                        }
-                        if (cd.dt < dt2)
-                            continue;
-                        cd.open = double.Parse(columns[1]);
-                        cd.high = double.Parse(columns[2]);
-                        cd.low = double.Parse(columns[3]);
-                        cd.close = double.Parse(columns[4]);
+                            var cd = new candle_data();
+                            if (DateTime.TryParseExact(columns[0].Substring(0, 19), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt))
+                            {
+                                timeframe = 10;
+                            }
+                            else if (DateTime.TryParseExact(columns[0].Substring(0, 19), "yyyy/MM/dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out cd.dt))
+                            {
+                                timeframe = 20;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            if (cd.dt < dt2)
+                                continue;
+                            cd.open = double.Parse(columns[1]);
+                            cd.high = double.Parse(columns[2]);
+                            cd.low = double.Parse(columns[3]);
+                            cd.close = double.Parse(columns[4]);
 
-                        cd.interest = int.Parse(columns[5]);
-                        cd.v = int.Parse(columns[6]);
-                        candle_series.Add(cd);
+                            cd.interest = int.Parse(columns[5]);
+                            cd.v = int.Parse(columns[6]);
+                            candle_series.Add(cd);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex);
+                        }
                         //Double.TryParse()
                     }
                 }
