@@ -401,7 +401,7 @@ namespace candlestick_test
         {
             //Suppose when User Press Ctrl + J then Click Button1
 
-            if (e.KeyCode == Keys.NumPad0)
+            if (e.KeyCode == Keys.NumPad0 )
             {
                 button5.PerformClick();
             }
