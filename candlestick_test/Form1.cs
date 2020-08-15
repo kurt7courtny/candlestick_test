@@ -20,7 +20,7 @@ namespace candlestick_test
         private bool play_state;
         private instrument_data my_instrument_data;
         private trades_all mytrades;
-        private trade_single mytrade;
+        private trades_s mytrade;
         private candle_data cd;
         private int pos;
         private Timer myTimer;        
@@ -34,7 +34,7 @@ namespace candlestick_test
 
             my_instrument_data = new instrument_data();
             mytrades = new trades_all();
-            mytrade = null;
+            mytrade = new trades_s();
             cd = new candle_data();
             pos = 0;
 
@@ -77,7 +77,7 @@ namespace candlestick_test
                     init_candle();
                     mytrades = new trades_all();
                     pos = 0;
-                    mytrade = null;
+                    mytrade = new trades_s();
                     //draw_candle();
                 }
                 else
@@ -328,11 +328,16 @@ namespace candlestick_test
         private void button1_Click(object sender, EventArgs e)
         {
             // close
-            if (mytrade != null && cd != null)
+            if (mytrade.direction != 0 && cd != null)
             {
-                mytrade.close_price = cd.close;
-                mytrades.addnewtrade(mytrade);
-                mytrade = null;
+                mytrade.d_close = cd.close;
+                foreach(trade_single ts in mytrade.trades)
+                {
+                    ts.close_price = mytrade.d_close;
+                    mytrades.addnewtrade(ts);
+                }
+                
+                mytrade = new trades_s();
                 chart1.Series["price"].Points[pos].Label = "<";
             }
             else
@@ -344,38 +349,50 @@ namespace candlestick_test
         private void button2_Click(object sender, EventArgs e)
         {
             // sell
-            if ( mytrade == null && my_instrument_data.candle_series.Count>0 && cd != null)
+            if ( mytrade.direction != 1 && my_instrument_data.candle_series.Count>0 && cd != null)
             {
-                mytrade = new trade_single();
-                mytrade.str_instrumentid = my_instrument_data.instrument_name;
                 mytrade.direction = -1;
-                mytrade.dt = cd.dt;
-                mytrade.open_price = cd.close;
-                mytrade.lots = 1;
+                trade_single ts = new trade_single();
+                ts.str_instrumentid = my_instrument_data.instrument_name;
+                ts.direction = -1;
+                ts.dt = cd.dt;
+                ts.open_price = cd.close;
+                ts.lots = mytrade.get_lots();
+                mytrade.trades.Add(ts);
                 chart1.Series["price"].Points[pos].Label = "v";
+                tool_status.Text = "空头仓位!" + mytrade.t_lots;
             }
             else
             {
-                tool_status.Text = "请先平仓!";
+                //tool_status.Text = "请先平仓!";
             }
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             //buy
-            if (mytrade == null && my_instrument_data.candle_series.Count > 0 && cd != null)
+            if (mytrade.direction != -1 && my_instrument_data.candle_series.Count > 0 && cd != null)
             {
-                mytrade = new trade_single();
-                mytrade.str_instrumentid = my_instrument_data.instrument_name;
+                //mytrade = new trade_single();
+                //mytrade.str_instrumentid = my_instrument_data.instrument_name;
+                //mytrade.direction = 1;
+                //mytrade.dt = cd.dt;
+                //mytrade.open_price = cd.close;
+                //mytrade.lots = 1;
                 mytrade.direction = 1;
-                mytrade.dt = cd.dt;
-                mytrade.open_price = cd.close;
-                mytrade.lots = 1;
+                trade_single ts = new trade_single();
+                ts.str_instrumentid = my_instrument_data.instrument_name;
+                ts.direction = 1;
+                ts.dt = cd.dt;
+                ts.open_price = cd.close;
+                ts.lots = mytrade.get_lots();
+                mytrade.trades.Add(ts);
                 chart1.Series["price"].Points[pos].Label = "^";
+                tool_status.Text = "多头仓位!" + mytrade.t_lots;
             }
             else
             {
-                tool_status.Text = "请先平仓!";
+                //tool_status.Text = "请先平仓!";
             }
 
         }

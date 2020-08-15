@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 
 namespace candlestick_test
 {
@@ -107,6 +108,37 @@ namespace candlestick_test
         {
             str_instrumentid = "Unkown";
             lots = 1;
+        }
+    }
+
+    // 完整的一次交易
+    public class trades_s
+    {
+        public int[] lots_list;
+        public ArrayList trades;
+        public int trade_numb;
+        public double d_close;
+        public int direction;           // -1, 1
+        public int t_lots;
+        public trades_s()
+        {
+            lots_list = new int[] { 3, 2, 1 };
+            trades = new ArrayList();
+            trade_numb = 0;
+            d_close = 0;
+            direction = 0;
+            t_lots = 0;
+        }
+        public int get_lots()
+        {
+            int resp = 1;
+            if(trade_numb < lots_list.Length)
+            {
+                resp =  lots_list[trade_numb];
+            }
+            t_lots += resp;
+            trade_numb++;
+            return resp;
         }
     }
 
