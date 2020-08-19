@@ -226,10 +226,11 @@ namespace candlestick_test
             if (cd != null)
                 label5.Text = "k线时间：" + cd.dt.ToString();
             textBox1.Text = String.Format("{0:0,0.0}", mytrades.totalfunds);
-            label3.Text = "胜率 盈：" + mytrades.wins + ", 亏：" + mytrades.loses + "，总：" + mytrades.totaltrades; 
-            if( mytrades.totaltrades != 0)
+            label3.Text = "胜率 盈：" + mytrades.wins + ", 亏：" + mytrades.loses + "，总：" + mytrades.totaltrades;
+            int tt = mytrades.wins + mytrades.loses;
+            if ( tt != 0)
             {
-                label3.Text += "，胜率：" + String.Format("{0:0.#}%", ((double)mytrades.wins) / mytrades.totaltrades * 100);
+                label3.Text += "，胜率：" + String.Format("{0:0.#}%", ((double)mytrades.wins) / tt * 100);
             }
             if( mytrades.loses != 0 && mytrades.wins != 0)
             {
@@ -339,6 +340,7 @@ namespace candlestick_test
                 
                 mytrade = new trades_s();
                 chart1.Series["price"].Points[pos].Label = "<";
+                tool_status.Text = "已平仓!";
             }
             else
             {

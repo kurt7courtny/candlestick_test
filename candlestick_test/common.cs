@@ -167,16 +167,16 @@ namespace candlestick_test
         {
             if( mytrade != null)
             {
-                double profit = (mytrade.close_price - mytrade.open_price) * mytrade.direction;
+                double profit = (mytrade.close_price - mytrade.open_price) * mytrade.direction * mytrade.lots;
                 if (profit > 0)
                 {
                     winfunds += profit;
-                    wins ++;
+                    wins +=mytrade.lots;
                 }
                 else
                 {
                     losefunds += profit;
-                    loses++;
+                    loses += mytrade.lots;
                 }
 
                 totalfunds += profit;
