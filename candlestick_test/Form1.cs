@@ -121,7 +121,9 @@ namespace candlestick_test
                 //chart1.ChartAreas[1].AxisY.IsStartedFromZero = false;   //此为解决Y轴自适应
 
                 Random r = new Random();
-                my_instrument_data.price_pos = r.Next(0, my_instrument_data.candle_series.Count - b_candle_numbs - f_candle_numbs)/3 + f_candle_numbs; //for ints
+                int maxv = my_instrument_data.candle_series.Count - b_candle_numbs - f_candle_numbs;
+                int minv = f_candle_numbs;
+                my_instrument_data.price_pos = r.Next( minv + (int)((maxv-minv)*0.7), maxv); //for ints
                 for (int i = 0; i < f_candle_numbs; i++)
                 {
                     cd = (candle_data)my_instrument_data.candle_series[my_instrument_data.price_pos];
