@@ -28,6 +28,7 @@ namespace candlestick_test
         public ArrayList candle_series;                        // 价格数据
         public int price_pos;                                  // 目前的价格位置
         public int chart_pos;
+        public static int s_candle_numb = 300;                  // 每次复盘k线数量
 
         public instrument_data()
         {
@@ -44,6 +45,7 @@ namespace candlestick_test
             {
                 string[] lines = System.IO.File.ReadAllLines(fn);
                 DateTime dt2 = new DateTime(2016, 1, 1, 0, 0, 0);
+                ArrayList temp_candle = new ArrayList();
                 foreach (string line in lines)
                 {
                     string[] columns = line.Split(',');
@@ -75,7 +77,7 @@ namespace candlestick_test
 
                             cd.interest = int.Parse(columns[5]);
                             cd.v = int.Parse(columns[6]);
-                            candle_series.Add(cd);
+                            temp_candle.Add(cd);
                         }
                         catch (Exception ex)
                         {
@@ -83,6 +85,14 @@ namespace candlestick_test
                         }
                         //Double.TryParse()
                     }
+                }
+                Random r = new Random();
+                int temp_start = r.Next(0, Math.Max(0, temp_candle.Count - s_candle_numb));
+                int temp_end = Math.Min(temp_candle.Count, temp_start + s_candle_numb);
+                if( temp_end > 0)
+                {
+                    candle_series = temp_candle.GetRange(temp_start, temp_end - temp_start);
+                    price_pos = 0;
                 }
                 instrument_name = Path.GetFileNameWithoutExtension(fn);
                 bflag = true;
