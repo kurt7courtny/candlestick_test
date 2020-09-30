@@ -60,15 +60,15 @@ namespace candlestick_test
             // chart1
             // 
             chartArea1.Name = "ChartArea1";
-            chartArea1.Position.Auto = true;
-            chartArea1.Position.Height = 100F;
+            chartArea1.Position.Auto = false;
+            chartArea1.Position.Height = 97F;
             chartArea1.Position.Width = 80F;
             chartArea1.Position.X = 1F;
             chartArea1.Position.Y = 3F;
-            
             this.chart1.ChartAreas.Add(chartArea1);
-            //legend1.IsTextAutoFit = false;
-            legend1.Font = new Font("Courier New", 12.0f, FontStyle.Italic);
+            legend1.AutoFitMinFontSize = 5;
+            legend1.Font = new System.Drawing.Font("Courier New", 12F, System.Drawing.FontStyle.Italic);
+            legend1.IsTextAutoFit = false;
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(0, 125);
